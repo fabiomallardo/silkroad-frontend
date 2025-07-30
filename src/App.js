@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from 'react';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes';
+import Sidebar from './components/Sidebar';
+import Navbar from './components/Navbar';
+import AuthProvider, { AuthContext } from './context/AuthContext';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
 
-function App() {
+function MainLayout() {
+  const { user } = useContext(AuthContext);
+
+  // Sidebar e Navbar SOLO se autenticato
+  if (!user) {
+    return (
+      <Box>
+        <AppRoutes />
+      </Box>
+    );
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box sx={{ display: 'flex' }}>
+      <Navbar />
+      <Sidebar />
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar />
+        <AppRoutes />
+      </Box>
+    </Box>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <BrowserRouter>
+          <MainLayout />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
