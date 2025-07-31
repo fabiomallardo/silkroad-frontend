@@ -104,7 +104,6 @@ export default function Products() {
     }
   };
 
-  // --- TOASTIFY CONFERMA ELIMINAZIONE ---
   const confirmToast = (id) => {
     const toastId = toast.info(
       <div>
@@ -118,13 +117,15 @@ export default function Products() {
         </div>
       </div>,
       {
-        autoClose: false, closeOnClick: false, closeButton: false, draggable: false,
+        autoClose: false, 
+        closeOnClick: false, 
+        closeButton: false, 
+        draggable: false,
         position: "top-right"
       }
     );
   };
 
-  // Elimina davvero
   const handleDelete = async (id) => {
     try {
       await api.delete(`/products/${id}`);
@@ -140,7 +141,9 @@ export default function Products() {
       <ToastContainer position="top-right" autoClose={2800} />
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h2 className="mb-0">Gestione Prodotti</h2>
-        <button className="btn btn-primary" onClick={() => handleOpen()}>Nuovo Prodotto</button>
+        <button className="btn btn-primary" onClick={() => handleOpen()}>
+          Nuovo Prodotto
+        </button>
       </div>
 
       <div className="row g-4">
@@ -153,20 +156,41 @@ export default function Products() {
           <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={p.id}>
             <div className="card h-100 shadow border-0">
               {p.imageUrl && (
-                <img src={p.imageUrl} alt={p.name} className="card-img-top" style={{ maxHeight: 180, objectFit: 'cover' }} />
+                <img 
+                  src={p.imageUrl} 
+                  alt={p.name} 
+                  className="card-img-top" 
+                  style={{ maxHeight: 180, objectFit: 'cover' }} 
+                />
               )}
               <div className="card-body d-flex flex-column">
                 <h5 className="card-title mb-1">{p.name}</h5>
-                <div className="mb-2 text-secondary small">{p.categoryName || <span className="fst-italic">Senza categoria</span>}</div>
+                <div className="mb-2 text-secondary small">
+                  {p.categoryName || <span className="fst-italic">Senza categoria</span>}
+                </div>
                 <div className="mb-2">
                   <span className="badge bg-primary me-1">€ {p.price}</span>
-                  <span className={`badge me-1 ${p.isActive ? 'bg-success' : 'bg-danger'}`}>{p.isActive ? "Attivo" : "Disattivo"}</span>
+                  <span className={`badge me-1 ${p.isActive ? 'bg-success' : 'bg-danger'}`}>
+                    {p.isActive ? "Attivo" : "Disattivo"}
+                  </span>
                   <span className="badge bg-secondary">Stock: {p.stockQuantity}</span>
                 </div>
-                <p className="card-text small flex-grow-1">{p.description?.slice(0, 60)}{p.description?.length > 60 ? "..." : ""}</p>
+                <p className="card-text small flex-grow-1">
+                  {p.description?.slice(0, 60)}{p.description?.length > 60 ? "..." : ""}
+                </p>
                 <div className="mt-auto">
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => handleOpen(p)}>Modifica</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => confirmToast(p.id)}>Elimina</button>
+                  <button 
+                    className="btn btn-sm btn-outline-secondary me-2" 
+                    onClick={() => handleOpen(p)}
+                  >
+                    Modifica
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-outline-danger" 
+                    onClick={() => confirmToast(p.id)}
+                  >
+                    Elimina
+                  </button>
                 </div>
               </div>
             </div>
@@ -174,48 +198,92 @@ export default function Products() {
         ))}
       </div>
 
-      {/* MODAL AGGIUNGI/MODIFICA */}
-      <div className={`modal fade ${showModal ? 'show d-block' : ''}`} tabIndex="-1" style={showModal ? { background: 'rgba(0,0,0,.2)' } : {}} >
+      {/* Modal Aggiungi/Modifica */}
+      <div 
+        className={`modal fade ${showModal ? 'show d-block' : ''}`} 
+        tabIndex="-1" 
+        style={showModal ? { background: 'rgba(0,0,0,.2)' } : {}} 
+      >
         <div className="modal-dialog modal-dialog-centered">
           <form className="modal-content" onSubmit={handleSubmit}>
             <div className="modal-header">
-              <h5 className="modal-title">{editId ? "Modifica Prodotto" : "Nuovo Prodotto"}</h5>
-              <button type="button" className="btn-close" onClick={handleClose}></button>
+              <h5 className="modal-title">
+                {editId ? "Modifica Prodotto" : "Nuovo Prodotto"}
+              </h5>
+              <button 
+                type="button" 
+                className="btn-close" 
+                onClick={handleClose}
+              ></button>
             </div>
             <div className="modal-body">
               <div className="mb-2">
                 <label className="form-label">Nome*</label>
-                <input type="text" className="form-control" value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })} required minLength={3} />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })} 
+                  required 
+                  minLength={3} 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">Descrizione</label>
-                <textarea className="form-control" value={form.description}
-                  onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
+                <textarea 
+                  className="form-control" 
+                  value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })} 
+                  rows={2} 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">Prezzo*</label>
-                <input type="number" className="form-control" value={form.price}
-                  onChange={e => setForm({ ...form, price: e.target.value })} step="0.01" min={0.01} required />
+                <input 
+                  type="number" 
+                  className="form-control" 
+                  value={form.price}
+                  onChange={e => setForm({ ...form, price: e.target.value })} 
+                  step="0.01" 
+                  min={0.01} 
+                  required 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">Quantità in stock*</label>
-                <input type="number" className="form-control" value={form.stockQuantity}
-                  onChange={e => setForm({ ...form, stockQuantity: e.target.value })} min={0} required />
+                <input 
+                  type="number" 
+                  className="form-control" 
+                  value={form.stockQuantity}
+                  onChange={e => setForm({ ...form, stockQuantity: e.target.value })} 
+                  min={0} 
+                  required 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">SKU*</label>
-                <input type="text" className="form-control" value={form.sku}
-                  onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })} maxLength={50} required />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={form.sku}
+                  onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })} 
+                  maxLength={50} 
+                  required 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">Immagine URL</label>
-                <input type="text" className="form-control" value={form.imageUrl}
-                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={form.imageUrl}
+                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} 
+                />
               </div>
               <div className="mb-2">
                 <label className="form-label">Categoria</label>
-                <select className="form-select"
+                <select 
+                  className="form-select"
                   value={form.categoryId}
                   onChange={e => setForm({ ...form, categoryId: e.target.value })}
                 >
@@ -227,8 +295,19 @@ export default function Products() {
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={handleClose}>Annulla</button>
-              <button type="submit" className="btn btn-primary">Salva</button>
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={handleClose}
+              >
+                Annulla
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+              >
+                Salva
+              </button>
             </div>
           </form>
         </div>
