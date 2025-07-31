@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
-import { Button, TextField, Paper, Typography, Box, Snackbar } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import {
+  Button, TextField, Paper, Typography, Box, Snackbar
+} from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -33,9 +35,53 @@ export default function Register() {
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="#f5f7fb">
-      <Paper elevation={3} sx={{ p: 4, width: 400 }}>
-        <Typography variant="h5" align="center" mb={2}>SILKROAD – Registrazione</Typography>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(120deg, #e8eaf6 30%, #ffe0f5 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          p: 4,
+          width: 400,
+          borderRadius: 5,
+          boxShadow: "0 8px 32px rgba(80,80,180,0.14)",
+          background: "rgba(255,255,255,0.94)",
+          backdropFilter: "blur(2px)"
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
+          <img
+            src="/logo.png"
+            alt="SILKROAD"
+            style={{
+              width: 60,
+              height: 60,
+              objectFit: "contain",
+              marginBottom: 6,
+              filter: "drop-shadow(0 2px 6px #cec1fc)"
+            }}
+            onError={e => { e.target.src = '/logo-placeholder.png'; }}
+          />
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+              color: "#5A56E9",
+              letterSpacing: ".06em",
+              fontFamily: 'Montserrat, sans-serif',
+              textShadow: "0 2px 10px #ede9ff"
+            }}
+            align="center"
+          >
+            SILKROAD – Registrazione
+          </Typography>
+        </Box>
         <form onSubmit={handleSubmit} autoComplete="off">
           <TextField
             label="Nome"
@@ -45,6 +91,11 @@ export default function Register() {
             fullWidth
             margin="normal"
             required
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
           <TextField
             label="Cognome"
@@ -54,6 +105,11 @@ export default function Register() {
             fullWidth
             margin="normal"
             required
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
           <TextField
             label="Email"
@@ -64,6 +120,11 @@ export default function Register() {
             fullWidth
             margin="normal"
             required
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
           <TextField
             label="Password"
@@ -75,6 +136,11 @@ export default function Register() {
             margin="normal"
             required
             helperText="Almeno 8 caratteri. Usa maiuscole, minuscole, numeri e simboli."
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
           <TextField
             label="Indirizzo"
@@ -84,6 +150,11 @@ export default function Register() {
             fullWidth
             margin="normal"
             required
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
           <TextField
             label="Telefono"
@@ -94,12 +165,45 @@ export default function Register() {
             margin="normal"
             required
             helperText="Solo numeri, anche con +. Es: +393331234567"
+            sx={{
+              bgcolor: "#f5f7fa",
+              borderRadius: 1,
+              '& .MuiInputBase-input': { fontWeight: 500 }
+            }}
           />
-          {error && <Typography color="error" variant="body2">{error}</Typography>}
-          <Button variant="contained" fullWidth sx={{ mt: 2 }} type="submit">
+          {error && <Typography color="error" variant="body2" mt={1}>{error}</Typography>}
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 2,
+              py: 1.3,
+              borderRadius: 2,
+              fontWeight: 700,
+              letterSpacing: ".03em",
+              fontSize: "1.07rem",
+              background: "linear-gradient(90deg, #5A56E9, #c283fd 70%)"
+            }}
+            type="submit"
+          >
             Registrati
           </Button>
         </form>
+        <Typography align="center" sx={{ mt: 3 }}>
+          <Link
+            to="/login"
+            style={{
+              textDecoration: 'none',
+              color: "#b94cf2",
+              fontWeight: 700,
+              letterSpacing: ".01em"
+            }}
+            onMouseOver={e => (e.target.style.color = "#5A56E9")}
+            onMouseOut={e => (e.target.style.color = "#b94cf2")}
+          >
+            Hai già un account? Login
+          </Link>
+        </Typography>
         <Snackbar
           open={snackbar.open}
           autoHideDuration={2000}

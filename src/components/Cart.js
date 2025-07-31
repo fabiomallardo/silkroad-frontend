@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/axios'; // La tua istanza Axios già autenticata!
 import { Button, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { CartContext } from '../context/CartContext';
 
 export default function Cart() {
   const [cart, setCart] = useState(null);

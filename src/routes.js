@@ -11,6 +11,9 @@ import UserCart from './pages/UserCart';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import { AuthContext } from './context/AuthContext';
+import Profile from './pages/Profile';
+import ProductSearchResults from './pages/ProductSearchResults';
+import Categories from './pages/Categories';
 
 export default function AppRoutes() {
   const { user } = useContext(AuthContext);
@@ -34,7 +37,12 @@ export default function AppRoutes() {
       {/* Storico ordini utente */}
       <Route path="/orders/my-orders" element={user ? <Orders /> : <Navigate to="/login" replace />} />
       {/* Dettaglio ordine */}
+      <Route path="/search" element={<ProductSearchResults />} />
       <Route path="/orders/:orderId" element={user ? <OrderDetail /> : <Navigate to="/login" replace />} />
+
+      <Route path="/profile" element={<Profile />} />
+
+<Route path="/categories" element={<Categories />} />
 
       {/* Rotte non trovate */}
       <Route path="*" element={<Navigate to="/" replace />} />

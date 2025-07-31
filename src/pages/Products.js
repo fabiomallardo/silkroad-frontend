@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -18,14 +19,35 @@ export default function Products() {
   });
   const [editId, setEditId] = useState(null);
 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const categoryId = queryParams.get('categoryId');
+
+  // Carica prodotti in base alla categoria selezionata
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line
+  }, [categoryId]);
+
+  // Carica le categorie solo al mount
+  useEffect(() => {
     fetchCategories();
+    // eslint-disable-next-line
   }, []);
 
   const fetchProducts = async () => {
-    const res = await api.get('/products');
-    setProducts(res.data.content || []);
+    try {
+      let res;
+      if (categoryId) {
+        res = await api.get(`/products/category/${categoryId}`);
+      } else {
+        res = await api.get('/products');
+      }
+      setProducts(res.data.content || []);
+    } catch {
+      setProducts([]);
+      toast.error("Errore nel caricamento prodotti!");
+    }
   };
 
   const fetchCategories = async () => {
@@ -128,9 +150,9 @@ export default function Products() {
         </div>
       </div>,
       {
-        autoClose: false, 
-        closeOnClick: false, 
-        closeButton: false, 
+        autoClose: false,
+        closeOnClick: false,
+        closeButton: false,
         draggable: false,
         position: "top-right"
       }
@@ -147,11 +169,29 @@ export default function Products() {
     }
   };
 
+  // ----------- STYLE PER HOVER -----------
+  const cardStyle = {
+    transition: 'box-shadow .17s, transform .15s',
+    borderRadius: 18,
+    border: 0,
+    boxShadow: '0 3px 16px 0 rgba(50,60,130,.08)',
+    cursor: 'pointer',
+    background: 'linear-gradient(120deg, #fff 75%, #e3e7ef 100%)'
+  };
+  const cardHover = {
+    boxShadow: '0 8px 32px 0 rgba(40,60,120,.16)',
+    transform: 'scale(1.03) translateY(-4px)',
+    border: '2px solid #1976d2'
+  };
+
+  // Serve per hover su card (solo React, senza styled-components)
+  const [hoverIdx, setHoverIdx] = useState(null);
+
   return (
-    <div className="container my-4">
+    <div className="container my-4" style={{ maxWidth: 1280 }}>
       <ToastContainer position="top-right" autoClose={2800} />
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="mb-0">Gestione Prodotti</h2>
+        <h2 className="mb-0 fw-bold" style={{ letterSpacing: '.03em' }}>Gestione Prodotti</h2>
         <button className="btn btn-primary" onClick={() => handleOpen()}>
           Nuovo Prodotto
         </button>
@@ -163,46 +203,67 @@ export default function Products() {
             <div className="alert alert-info">Nessun prodotto trovato.</div>
           </div>
         )}
-        {products.map((p) => (
-          <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={p.id}>
-            <div className="card h-100 shadow border-0">
+        {products.map((p, idx) => (
+          <div
+            className="col-12 col-sm-6 col-md-4 col-lg-3"
+            key={p.id}
+            onMouseEnter={() => setHoverIdx(idx)}
+            onMouseLeave={() => setHoverIdx(null)}
+          >
+            <div
+              className="card h-100"
+              style={hoverIdx === idx
+                ? { ...cardStyle, ...cardHover }
+                : cardStyle}
+            >
               {p.imageUrl && (
-                <img 
-                  src={p.imageUrl} 
-                  alt={p.name} 
-                  className="card-img-top" 
-                  style={{ maxHeight: 180, objectFit: 'cover' }} 
+                <img
+                  src={p.imageUrl}
+                  alt={p.name}
+                  className="card-img-top"
+                  style={{
+                    maxHeight: 180,
+                    objectFit: 'cover',
+                    borderTopLeftRadius: 18,
+                    borderTopRightRadius: 18
+                  }}
                 />
               )}
               <div className="card-body d-flex flex-column">
-                <h5 className="card-title mb-1">{p.name}</h5>
+                <h5 className="card-title mb-1 fw-bold" style={{ color: '#143364', letterSpacing: '.01em' }}>
+                  {p.name}
+                </h5>
                 <div className="mb-2 text-secondary small">
                   {p.categoryName || <span className="fst-italic">Senza categoria</span>}
                 </div>
-                <div className="mb-2">
-                  <span className="badge bg-primary me-1">€ {p.price}</span>
-                  <span className={`badge me-1 ${p.isActive ? 'bg-success' : 'bg-danger'}`}>
+                <div className="mb-2 d-flex align-items-center flex-wrap gap-2">
+                  <span className="badge bg-primary" style={{ fontSize: 15, padding: '6px 14px' }}>
+                    € {p.price}
+                  </span>
+                  <span className={`badge ${p.isActive ? 'bg-success' : 'bg-danger'}`}>
                     {p.isActive ? "Attivo" : "Disattivo"}
                   </span>
-                  <span className="badge bg-secondary">Stock: {p.stockQuantity}</span>
+                  <span className="badge bg-secondary">
+                    Stock: {p.stockQuantity}
+                  </span>
                 </div>
                 <p className="card-text small flex-grow-1">
                   {p.description?.slice(0, 60)}{p.description?.length > 60 ? "..." : ""}
                 </p>
                 <div className="mt-auto d-flex flex-wrap gap-2">
-                  <button 
+                  <button
                     className="btn btn-sm btn-outline-secondary"
                     onClick={() => handleOpen(p)}
                   >
                     Modifica
                   </button>
-                  <button 
+                  <button
                     className="btn btn-sm btn-outline-danger"
                     onClick={() => confirmToast(p.id)}
                   >
                     Elimina
                   </button>
-                  <button 
+                  <button
                     className="btn btn-sm btn-success"
                     onClick={() => addToCart(p.id)}
                   >
@@ -216,10 +277,10 @@ export default function Products() {
       </div>
 
       {/* Modal Aggiungi/Modifica */}
-      <div 
-        className={`modal fade ${showModal ? 'show d-block' : ''}`} 
-        tabIndex="-1" 
-        style={showModal ? { background: 'rgba(0,0,0,.2)' } : {}} 
+      <div
+        className={`modal fade ${showModal ? 'show d-block' : ''}`}
+        tabIndex="-1"
+        style={showModal ? { background: 'rgba(0,0,0,.2)' } : {}}
       >
         <div className="modal-dialog modal-dialog-centered">
           <form className="modal-content" onSubmit={handleSubmit}>
@@ -227,79 +288,79 @@ export default function Products() {
               <h5 className="modal-title">
                 {editId ? "Modifica Prodotto" : "Nuovo Prodotto"}
               </h5>
-              <button 
-                type="button" 
-                className="btn-close" 
+              <button
+                type="button"
+                className="btn-close"
                 onClick={handleClose}
               ></button>
             </div>
             <div className="modal-body">
               <div className="mb-2">
                 <label className="form-label">Nome*</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
+                <input
+                  type="text"
+                  className="form-control"
                   value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })} 
-                  required 
-                  minLength={3} 
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  required
+                  minLength={3}
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">Descrizione</label>
-                <textarea 
-                  className="form-control" 
+                <textarea
+                  className="form-control"
                   value={form.description}
-                  onChange={e => setForm({ ...form, description: e.target.value })} 
-                  rows={2} 
+                  onChange={e => setForm({ ...form, description: e.target.value })}
+                  rows={2}
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">Prezzo*</label>
-                <input 
-                  type="number" 
-                  className="form-control" 
+                <input
+                  type="number"
+                  className="form-control"
                   value={form.price}
-                  onChange={e => setForm({ ...form, price: e.target.value })} 
-                  step="0.01" 
-                  min={0.01} 
-                  required 
+                  onChange={e => setForm({ ...form, price: e.target.value })}
+                  step="0.01"
+                  min={0.01}
+                  required
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">Quantità in stock*</label>
-                <input 
-                  type="number" 
-                  className="form-control" 
+                <input
+                  type="number"
+                  className="form-control"
                   value={form.stockQuantity}
-                  onChange={e => setForm({ ...form, stockQuantity: e.target.value })} 
-                  min={0} 
-                  required 
+                  onChange={e => setForm({ ...form, stockQuantity: e.target.value })}
+                  min={0}
+                  required
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">SKU*</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
+                <input
+                  type="text"
+                  className="form-control"
                   value={form.sku}
-                  onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })} 
-                  maxLength={50} 
-                  required 
+                  onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })}
+                  maxLength={50}
+                  required
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">Immagine URL</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
+                <input
+                  type="text"
+                  className="form-control"
                   value={form.imageUrl}
-                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} 
+                  onChange={e => setForm({ ...form, imageUrl: e.target.value })}
                 />
               </div>
               <div className="mb-2">
                 <label className="form-label">Categoria</label>
-                <select 
+                <select
                   className="form-select"
                   value={form.categoryId}
                   onChange={e => setForm({ ...form, categoryId: e.target.value })}
@@ -312,15 +373,15 @@ export default function Products() {
               </div>
             </div>
             <div className="modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={handleClose}
               >
                 Annulla
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn btn-primary"
               >
                 Salva
