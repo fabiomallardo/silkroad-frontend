@@ -193,10 +193,10 @@ Questa applicazione frontend è progettata per funzionare con il suo backend ded
 
 Questo progetto è stato sviluppato e mantenuto dai seguenti autori:
 
--   **Massimiliano Cassia** - *Boh* - [giovannidadone](https://github.com/giovannidadone);
--   **Jacopo De Martino** - *Boh* - [giovannidadone](https://github.com/giovannidadone);
--   **Giovanni Dadone** - *Boh* - [giovannidadone](https://github.com/giovannidadone);
--   **Fabio Mallardo** - *Boh* - [giovannidadone](https://github.com/giovannidadone).   
+-   **Massimiliano Cassia** - *Back-end developer* - [massimilianocassia](https://github.com/Massyiwnl);
+-   **Jacopo De Martino** - *Back-end developer* - [jacopodemartino](https://github.com/Jacopo-De-Martino);
+-   **Giovanni Dadone** - *Front-end developer* - [giovannidadone](https://github.com/giovannidadone);
+-   **Fabio Mallardo** - *Front-end developer* - [fabiomallardo](https://github.com/fabiomallardo).      
 
 ---
 
