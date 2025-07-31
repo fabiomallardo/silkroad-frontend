@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import {
-  Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody,
-  Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Snackbar, Select, MenuItem, InputLabel, FormControl
-} from '@mui/material';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -19,15 +17,17 @@ export default function Products() {
     categoryId: ''
   });
   const [editId, setEditId] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
-  // Fetch prodotti
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
   const fetchProducts = async () => {
     const res = await api.get('/products');
     setProducts(res.data.content || []);
   };
 
-  // Fetch categorie
   const fetchCategories = async () => {
     try {
       const res = await api.get('/categories');
@@ -36,11 +36,6 @@ export default function Products() {
       setCategories([]);
     }
   };
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
 
   const handleOpen = (product = null) => {
     if (product) {
@@ -66,13 +61,13 @@ export default function Products() {
       });
       setEditId(null);
     }
-    setOpen(true);
+    setShowModal(true);
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => setShowModal(false);
 
-  const handleSubmit = async () => {
-    // Validazione minima
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (
       !form.name.trim() ||
       form.name.length < 3 ||
@@ -82,7 +77,7 @@ export default function Products() {
       parseInt(form.stockQuantity, 10) < 0 ||
       !form.sku.trim()
     ) {
-      setSnackbar({ open: true, message: 'Compila tutti i campi obbligatori con valori validi!' });
+      toast.warning('Compila tutti i campi obbligatori con valori validi!');
       return;
     }
     try {
@@ -97,149 +92,147 @@ export default function Products() {
       };
       if (editId) {
         await api.put(`/products/${editId}`, body);
-        setSnackbar({ open: true, message: 'Prodotto aggiornato!' });
+        toast.success('Prodotto aggiornato!');
       } else {
         await api.post('/products', body);
-        setSnackbar({ open: true, message: 'Prodotto creato!' });
+        toast.success('Prodotto creato!');
       }
       handleClose();
       fetchProducts();
     } catch (e) {
-      setSnackbar({ open: true, message: 'Errore nella richiesta: ' + (e.response?.data?.message || '') });
+      toast.error('Errore nella richiesta: ' + (e.response?.data?.message || ''));
     }
   };
 
+  // --- TOASTIFY CONFERMA ELIMINAZIONE ---
+  const confirmToast = (id) => {
+    const toastId = toast.info(
+      <div>
+        <div className="mb-2"><b>Vuoi davvero eliminare il prodotto?</b></div>
+        <div className="d-flex justify-content-end gap-2">
+          <button className="btn btn-sm btn-danger" onClick={async () => {
+            await handleDelete(id);
+            toast.dismiss(toastId);
+          }}>Elimina</button>
+          <button className="btn btn-sm btn-secondary" onClick={() => toast.dismiss(toastId)}>Annulla</button>
+        </div>
+      </div>,
+      {
+        autoClose: false, closeOnClick: false, closeButton: false, draggable: false,
+        position: "top-right"
+      }
+    );
+  };
+
+  // Elimina davvero
   const handleDelete = async (id) => {
     try {
       await api.delete(`/products/${id}`);
       fetchProducts();
-      setSnackbar({ open: true, message: 'Prodotto eliminato.' });
+      toast.success('Prodotto eliminato!');
     } catch {
-      setSnackbar({ open: true, message: 'Errore nell\'eliminazione!' });
+      toast.error('Errore nell\'eliminazione!');
     }
   };
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" mb={2}>Gestione Prodotti</Typography>
-      <Button variant="contained" onClick={() => handleOpen()}>Nuovo Prodotto</Button>
-      <Table sx={{ mt: 2 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Nome</TableCell>
-            <TableCell>Prezzo</TableCell>
-            <TableCell>Quantità</TableCell>
-            <TableCell>SKU</TableCell>
-            <TableCell>Categoria</TableCell>
-            <TableCell>Attivo</TableCell>
-            <TableCell>Immagine</TableCell>
-            <TableCell>Azioni</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(products || []).map(p => (
-            <TableRow key={p.id}>
-              <TableCell>{p.name}</TableCell>
-              <TableCell>{p.price}</TableCell>
-              <TableCell>{p.stockQuantity}</TableCell>
-              <TableCell>{p.sku}</TableCell>
-              <TableCell>{p.categoryName || p.categoryId}</TableCell>
-              <TableCell>{p.isActive ? '✔️' : '❌'}</TableCell>
-              <TableCell>
-                {p.imageUrl && (
-                  <img src={p.imageUrl} alt={p.name} style={{ width: 50, maxHeight: 50, objectFit: 'cover', borderRadius: 5 }} />
-                )}
-              </TableCell>
-              <TableCell>
-                <Button size="small" onClick={() => handleOpen(p)}>Modifica</Button>
-                <Button size="small" color="error" onClick={() => handleDelete(p.id)}>Elimina</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="container my-4">
+      <ToastContainer position="top-right" autoClose={2800} />
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <h2 className="mb-0">Gestione Prodotti</h2>
+        <button className="btn btn-primary" onClick={() => handleOpen()}>Nuovo Prodotto</button>
+      </div>
 
-      {/* Dialog aggiunta/modifica prodotto */}
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{editId ? "Modifica Prodotto" : "Nuovo Prodotto"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Nome"
-            value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Descrizione"
-            value={form.description}
-            onChange={e => setForm({ ...form, description: e.target.value })}
-            fullWidth
-            margin="normal"
-            multiline
-            rows={2}
-          />
-          <TextField
-            label="Prezzo"
-            type="number"
-            value={form.price}
-            onChange={e => setForm({ ...form, price: e.target.value })}
-            fullWidth
-            margin="normal"
-            required
-            inputProps={{ step: "0.01", min: 0.01, max: 999999.99 }}
-          />
-          <TextField
-            label="Quantità in stock"
-            type="number"
-            value={form.stockQuantity}
-            onChange={e => setForm({ ...form, stockQuantity: e.target.value })}
-            fullWidth
-            margin="normal"
-            required
-            inputProps={{ min: 0 }}
-          />
-          <TextField
-            label="SKU"
-            value={form.sku}
-            onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })}
-            fullWidth
-            margin="normal"
-            required
-            inputProps={{ maxLength: 50 }}
-          />
-          <TextField
-            label="Immagine URL"
-            value={form.imageUrl}
-            onChange={e => setForm({ ...form, imageUrl: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
-          {/* Select categoria */}
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="categoria-label">Categoria</InputLabel>
-            <Select
-              labelId="categoria-label"
-              value={form.categoryId}
-              label="Categoria"
-              onChange={e => setForm({ ...form, categoryId: e.target.value })}
-            >
-              <MenuItem value="">
-                <em>Nessuna</em>
-              </MenuItem>
-              {categories.map(c =>
-                <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+      <div className="row g-4">
+        {products.length === 0 && (
+          <div className="col-12">
+            <div className="alert alert-info">Nessun prodotto trovato.</div>
+          </div>
+        )}
+        {products.map((p) => (
+          <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={p.id}>
+            <div className="card h-100 shadow border-0">
+              {p.imageUrl && (
+                <img src={p.imageUrl} alt={p.name} className="card-img-top" style={{ maxHeight: 180, objectFit: 'cover' }} />
               )}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Annulla</Button>
-          <Button onClick={handleSubmit}>Salva</Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar open={snackbar.open} autoHideDuration={3500} onClose={() => setSnackbar({ open: false, message: '' })} message={snackbar.message} />
-    </Paper>
+              <div className="card-body d-flex flex-column">
+                <h5 className="card-title mb-1">{p.name}</h5>
+                <div className="mb-2 text-secondary small">{p.categoryName || <span className="fst-italic">Senza categoria</span>}</div>
+                <div className="mb-2">
+                  <span className="badge bg-primary me-1">€ {p.price}</span>
+                  <span className={`badge me-1 ${p.isActive ? 'bg-success' : 'bg-danger'}`}>{p.isActive ? "Attivo" : "Disattivo"}</span>
+                  <span className="badge bg-secondary">Stock: {p.stockQuantity}</span>
+                </div>
+                <p className="card-text small flex-grow-1">{p.description?.slice(0, 60)}{p.description?.length > 60 ? "..." : ""}</p>
+                <div className="mt-auto">
+                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => handleOpen(p)}>Modifica</button>
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => confirmToast(p.id)}>Elimina</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* MODAL AGGIUNGI/MODIFICA */}
+      <div className={`modal fade ${showModal ? 'show d-block' : ''}`} tabIndex="-1" style={showModal ? { background: 'rgba(0,0,0,.2)' } : {}} >
+        <div className="modal-dialog modal-dialog-centered">
+          <form className="modal-content" onSubmit={handleSubmit}>
+            <div className="modal-header">
+              <h5 className="modal-title">{editId ? "Modifica Prodotto" : "Nuovo Prodotto"}</h5>
+              <button type="button" className="btn-close" onClick={handleClose}></button>
+            </div>
+            <div className="modal-body">
+              <div className="mb-2">
+                <label className="form-label">Nome*</label>
+                <input type="text" className="form-control" value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })} required minLength={3} />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Descrizione</label>
+                <textarea className="form-control" value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Prezzo*</label>
+                <input type="number" className="form-control" value={form.price}
+                  onChange={e => setForm({ ...form, price: e.target.value })} step="0.01" min={0.01} required />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Quantità in stock*</label>
+                <input type="number" className="form-control" value={form.stockQuantity}
+                  onChange={e => setForm({ ...form, stockQuantity: e.target.value })} min={0} required />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">SKU*</label>
+                <input type="text" className="form-control" value={form.sku}
+                  onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "") })} maxLength={50} required />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Immagine URL</label>
+                <input type="text" className="form-control" value={form.imageUrl}
+                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Categoria</label>
+                <select className="form-select"
+                  value={form.categoryId}
+                  onChange={e => setForm({ ...form, categoryId: e.target.value })}
+                >
+                  <option value="">Senza categoria</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={handleClose}>Annulla</button>
+              <button type="submit" className="btn btn-primary">Salva</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

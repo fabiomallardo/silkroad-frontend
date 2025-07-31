@@ -8,6 +8,9 @@ import Navbar from './components/Navbar';
 import AuthProvider, { AuthContext } from './context/AuthContext';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function MainLayout() {
   const { user } = useContext(AuthContext);
@@ -38,6 +41,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <BrowserRouter>
+        <ToastContainer position="top-center" autoClose={2800} />
           <MainLayout />
         </BrowserRouter>
       </AuthProvider>
