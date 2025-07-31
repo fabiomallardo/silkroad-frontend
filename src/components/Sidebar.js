@@ -5,15 +5,22 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import CategoryIcon from '@mui/icons-material/Category';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import PeopleIcon from '@mui/icons-material/People';
-import InventoryIcon from '@mui/icons-material/Inventory';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Toolbar from '@mui/material/Toolbar';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box'; // Aggiungi questo import
 
 const menu = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { text: 'Utenti', icon: <PeopleIcon />, path: '/users' },
-  { text: 'Prodotti', icon: <InventoryIcon />, path: '/products' }
+  { text: 'Prodotti', icon: <ShoppingBagIcon />, path: '/products' },
+  { text: 'Categorie', icon: <CategoryIcon />, path: '/categories' },
+  { text: 'Offerte', icon: <LocalOfferIcon />, path: '/offers' },
+  { text: 'Clienti', icon: <PeopleIcon />, path: '/customers' }
 ];
 
 export default function Sidebar() {
@@ -24,18 +31,24 @@ export default function Sidebar() {
     <Drawer
       variant="permanent"
       sx={{
-        width: 220,
+        width: 240,
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
-          width: 220,
+          width: 240,
           boxSizing: 'border-box',
-          background: '#f7f8fa',
+          background: '#ffffff',
           borderRight: '1px solid #e3e7ef',
         },
       }}
     >
       <Toolbar />
-      <List sx={{ mt: 2 }}>
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+          Menu
+        </Typography>
+      </Box>
+      <Divider />
+      <List sx={{ mt: 1 }}>
         {menu.map((item) => (
           <ListItem
             button
@@ -43,13 +56,12 @@ export default function Sidebar() {
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
             sx={{
-              mb: 1,
-              borderRadius: 2,
+              mb: 0.5,
+              borderRadius: 1,
               mx: 1,
               '&.Mui-selected': {
                 backgroundColor: 'primary.light',
                 color: 'primary.main',
-                boxShadow: 1,
                 '& .MuiListItemIcon-root': { color: 'primary.main' },
               },
               '&:hover': {
@@ -65,7 +77,7 @@ export default function Sidebar() {
             </ListItemIcon>
             <ListItemText
               primary={item.text}
-              primaryTypographyProps={{ fontWeight: location.pathname === item.path ? 700 : 500 }}
+              primaryTypographyProps={{ fontWeight: location.pathname === item.path ? 600 : 500 }}
             />
           </ListItem>
         ))}
