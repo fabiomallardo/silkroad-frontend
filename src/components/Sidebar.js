@@ -13,14 +13,17 @@ import Toolbar from '@mui/material/Toolbar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box'; // Aggiungi questo import
+import Box from '@mui/material/Box'; 
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+
 
 const menu = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Prodotti', icon: <ShoppingBagIcon />, path: '/products' },
   { text: 'Categorie', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Offerte', icon: <LocalOfferIcon />, path: '/offers' },
-  { text: 'Clienti', icon: <PeopleIcon />, path: '/customers' }
+  { text: 'Clienti', icon: <PeopleIcon />, path: '/customers' },
+  { text: 'Ordini', icon: <ReceiptLongIcon />, path: '/orders/my-orders' }
 ];
 
 export default function Sidebar() {

@@ -104,6 +104,17 @@ export default function Products() {
     }
   };
 
+  // --- AGGIUNGI AL CARRELLO ---
+  const addToCart = async (productId) => {
+    try {
+      await api.post('/cart/items', { productId, quantity: 1 });
+      toast.success("Aggiunto al carrello!");
+    } catch {
+      toast.error("Errore nell'aggiunta al carrello");
+    }
+  };
+
+  // --- TOASTIFY PER DELETE CONFERMA ---
   const confirmToast = (id) => {
     const toastId = toast.info(
       <div>
@@ -178,18 +189,24 @@ export default function Products() {
                 <p className="card-text small flex-grow-1">
                   {p.description?.slice(0, 60)}{p.description?.length > 60 ? "..." : ""}
                 </p>
-                <div className="mt-auto">
+                <div className="mt-auto d-flex flex-wrap gap-2">
                   <button 
-                    className="btn btn-sm btn-outline-secondary me-2" 
+                    className="btn btn-sm btn-outline-secondary"
                     onClick={() => handleOpen(p)}
                   >
                     Modifica
                   </button>
                   <button 
-                    className="btn btn-sm btn-outline-danger" 
+                    className="btn btn-sm btn-outline-danger"
                     onClick={() => confirmToast(p.id)}
                   >
                     Elimina
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-success"
+                    onClick={() => addToCart(p.id)}
+                  >
+                    Aggiungi al carrello
                   </button>
                 </div>
               </div>

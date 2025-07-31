@@ -1,32 +1,51 @@
 import React, { createContext, useState, useEffect } from 'react';
-import api from '../api/axios'; // <-- assicurati che punti all'istanza Axios con baseURL /api
+import api from '../api/axios';
 
 export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  // Recupera user info se c'è un token
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      setUser({ token });
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Recupera info utente dal backend (API: /users/profile)
+      api.get('/users/profile')
+        .then(res => setUser({ ...res.data, token })) // puoi salvare tutto il profilo utente
+        .catch(() => {
+          setUser(null);
+          localStorage.removeItem('token');
+        });
     }
   }, []);
 
-  const login = (token) => {
+  // LOGIN: salva token e carica profilo utente
+  const login = async (token) => {
     localStorage.setItem('token', token);
-    setUser({ token });
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    try {
+      const res = await api.get('/users/profile');
+      setUser({ ...res.data, token });
+    } catch {
+      setUser({ token });
+    }
   };
 
-  // AGGIORNA QUI la funzione logout per chiamare il backend!
+  // LOGOUT: chiama logout backend e pulisce tutto
   const logout = async () => {
     try {
-      await api.post('/users/logout'); // chiama il backend per logout "server-side"
+      await api.post('/users/logout');
     } catch (e) {
-      // Non bloccare il logout lato client se il server fallisce (es: token già scaduto)
+      // ok: anche se fallisce server-side, esegui comunque logout client
     }
     localStorage.removeItem('token');
     setUser(null);
+    delete api.defaults.headers.common['Authorization'];
+
+    // Se usi anche CartContext, qui puoi azzerare il carrello globale:
+    // if (window.setCartCount) window.setCartCount(0);
   };
 
   return (
