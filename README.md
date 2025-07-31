@@ -107,78 +107,49 @@ Seguire questi passaggi per configurare l'ambiente di sviluppo e avviare l'appli
 La struttura del progetto segue le convenzioni di Create React App, organizzando il codice per funzionalità e responsabilità.
 
 ```
-src/
-├── 📂 api/                      # Configurazione API e servizi
-│   ├── axios.js                 # Istanza Axios configurata con interceptors
-│   └── endpoints.js             # Costanti degli endpoint API
+silkroad-frontend/
+├── 📂 public/
+│   ├── index.html
+│   ├── manifest.json
+│   └── robots.txt
 │
-├── 📂 components/               # Componenti React riutilizzabili
-│   ├── 📂 common/              # Componenti comuni dell'UI
-│   │   ├── Navbar.jsx          # Barra di navigazione principale
-│   │   ├── Sidebar.jsx         # Menu laterale
-│   │   ├── Footer.jsx          # Footer dell'applicazione
-│   │   └── LoadingSpinner.jsx  # Indicatore di caricamento
+├── 📂 src/
+│   ├── 📂 api/
+│   │   └── axios.js              # Configurazione Axios con interceptors
 │   │
-│   ├── 📂 dashboard/           # Componenti specifici della dashboard
-│   │   ├── StatsCard.jsx       # Card per statistiche
-│   │   ├── RecentOrders.jsx    # Lista ordini recenti
-│   │   └── SalesChart.jsx      # Grafico vendite
+│   ├── 📂 components/
+│   │   ├── Cart.js               # Componente carrello
+│   │   ├── Navbar.js             # Barra di navigazione principale  
+│   │   └── Sidebar.js            # Menu laterale
 │   │
-│   └── 📂 forms/               # Componenti form riutilizzabili
-│       ├── ProductForm.jsx      # Form prodotto
-│       └── UserForm.jsx         # Form utente
-│
-├── 📂 context/                  # Gestione stato globale con Context API
-│   ├── AuthContext.jsx          # Contesto autenticazione
-│   ├── ThemeContext.jsx         # Contesto tema (dark/light mode)
-│   └── NotificationContext.jsx  # Contesto notifiche globali
-│
-├── 📂 hooks/                    # Custom React Hooks
-│   ├── useAuth.js              # Hook per autenticazione
-│   ├── useApi.js               # Hook per chiamate API
-│   └── useLocalStorage.js      # Hook per localStorage
-│
-├── 📂 pages/                    # Componenti pagina (route-level)
-│   ├── 📂 auth/
-│   │   ├── Login.jsx           # Pagina di login
-│   │   └── Register.jsx        # Pagina registrazione
+│   ├── 📂 context/
+│   │   └── AuthContext.js        # Context per autenticazione
 │   │
-│   ├── 📂 admin/
-│   │   ├── Dashboard.jsx       # Dashboard amministratore
-│   │   ├── Products.jsx        # Gestione prodotti
-│   │   ├── Orders.jsx          # Gestione ordini
-│   │   └── Users.jsx           # Gestione utenti
+│   ├── 📂 pages/
+│   │   ├── Dashboard.js          # Dashboard principale
+│   │   ├── Home.js               # Landing page pubblica
+│   │   ├── Login.js              # Pagina login
+│   │   ├── OrderDetail.js        # Dettaglio ordine
+│   │   ├── Orders.js             # Lista ordini utente
+│   │   ├── Products.js           # Gestione prodotti
+│   │   ├── Register.js           # Pagina registrazione
+│   │   ├── UserCart.js           # Carrello utente
+│   │   └── Users.js              # Gestione utenti
 │   │
-│   └── 📂 public/
-│       ├── Home.jsx            # Homepage pubblica
-│       └── NotFound.jsx        # Pagina 404
+│   ├── App.css                   # Stili App
+│   ├── App.js                    # Componente root e layout
+│   ├── App.test.js               # Test del componente App
+│   ├── index.css                 # Stili globali
+│   ├── index.js                  # Entry point React
+│   ├── logo.svg                  # Logo React (default)
+│   ├── reportWebVitals.js        # Performance monitoring
+│   ├── routes.js                 # Configurazione routing
+│   ├── setupTests.js             # Setup per i test
+│   └── theme.js                  # Tema Material-UI personalizzato
 │
-├── 📂 services/                 # Servizi e logica business
-│   ├── authService.js          # Servizio autenticazione
-│   ├── productService.js       # Servizio prodotti
-│   └── orderService.js         # Servizio ordini
-│
-├── 📂 utils/                    # Funzioni di utilità
-│   ├── constants.js            # Costanti dell'applicazione
-│   ├── helpers.js              # Funzioni helper
-│   └── validators.js           # Funzioni di validazione
-│
-├── 📂 styles/                   # Stili globali e temi
-│   ├── theme.js                # Tema Material-UI personalizzato
-│   ├── globals.css             # Stili CSS globali
-│   └── variables.css           # Variabili CSS custom
-│
-├── 📂 assets/                   # Asset statici
-│   ├── 📂 images/              # Immagini
-│   ├── 📂 icons/               # Icone custom
-│   └── 📂 fonts/               # Font personalizzati
-│
-├── App.js                       # Componente root e routing principale
-├── App.css                      # Stili del componente App
-├── index.js                     # Entry point React
-├── index.css                    # Stili globali di base
-├── setupTests.js               # Configurazione test
-└── reportWebVitals.js          # Performance monitoring
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ## Collegamento al Backend
